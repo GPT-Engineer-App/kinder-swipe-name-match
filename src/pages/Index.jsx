@@ -48,30 +48,37 @@ const Index = () => {
     }
   }, [api, gone, currentIndex]);
 
-  const bind = useDrag(({ args: [index], down, movement: [mx], direction: [xDir], velocity }) => {
+  const bind = useDrag(({ args: [index], active, movement: [mx], direction: [xDir], velocity }) => {
     const trigger = velocity > 0.2;
     const dir = xDir < 0 ? -1 : 1;
-    if (!down && trigger) swipe(dir);
+
+    if (!active && trigger) {
+      gone.add(index);
+      swipe(dir);
+    }
+
     api.start(i => {
       if (index !== i) return;
       const isGone = gone.has(index);
-      const x = isGone ? (200 + window.innerWidth) * dir : down ? mx : 0;
-      const rot = mx / 100 + (isGone ? dir * 10 * velocity : 0);
-      const scale = down ? 1.1 : 1;
+      const x = isGone ? (200 + window.innerWidth) * dir : active ? mx : 0;
+      const rot = mx / 10 + (isGone ? dir * 10 * velocity : 0);
+      const scale = active ? 1.1 : 1;
       return {
         x,
         rot,
         scale,
         delay: undefined,
-        config: { friction: 50, tension: down ? 800 : isGone ? 200 : 500 },
+        config: { friction: 50, tension: active ? 800 : isGone ? 200 : 500 },
       };
     });
-    if (!down && gone.size === babyNames.length)
+
+    if (!active && gone.size === babyNames.length) {
       setTimeout(() => {
         gone.clear();
         api.start(i => to(i));
         setCurrentIndex(0);
       }, 600);
+    }
   });
 
   return (
