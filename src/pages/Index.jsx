@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useSprings, animated } from '@react-spring/web';
-import { useDrag } from '@react-spring/web';
+import { useDrag } from '@use-gesture/react';
 import { Heart, X } from 'lucide-react';
 
 const babyNames = [
