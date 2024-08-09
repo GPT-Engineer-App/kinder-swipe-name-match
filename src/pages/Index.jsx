@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useSprings, animated } from '@react-spring/web';
-import { useDrag } from '@use-gesture/react';
+import { useDrag } from '@react-spring/web';
 import { Heart, X } from 'lucide-react';
 
 const babyNames = [
@@ -59,7 +59,7 @@ const Index = () => {
       <div className="relative w-80 h-80">
         {props.map(({ x, y, rot, scale }, i) => (
           <animated.div
-            key={i}
+            key={babyNames[i]}
             style={{
               transform: to([x, y], (x, y) => `translate3d(${x}px,${y}px,0)`),
               position: 'absolute',
@@ -91,10 +91,10 @@ const Index = () => {
         ))}
       </div>
       <div className="mt-8 flex space-x-4">
-        <button className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-full">
+        <button aria-label="Dislike" className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-full">
           <X size={24} />
         </button>
-        <button className="bg-green-400 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-full">
+        <button aria-label="Like" className="bg-green-400 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-full">
           <Heart size={24} />
         </button>
       </div>
