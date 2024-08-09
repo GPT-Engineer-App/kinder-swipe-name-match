@@ -23,16 +23,35 @@ const trans = (r, s) =>
 
 const Index = () => {
   const [gone] = useState(() => new Set());
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [props, api] = useSprings(babyNames.length, i => ({
     ...to(i),
     from: from(i),
   }));
 
-  const bind = useCallback(
-    useDrag(({ args: [index], down, movement: [mx], direction: [xDir], velocity }) => {
+  const swipe = useCallback((dir) => {
+    if (currentIndex < babyNames.length) {
+      gone.add(currentIndex);
+      api.start(i => {
+        if (currentIndex !== i) return;
+        const x = (200 + window.innerWidth) * dir;
+        const rot = 100 * dir;
+        return {
+          x,
+          rot,
+          scale: 1,
+          delay: undefined,
+          config: { friction: 50, tension: 200 },
+        };
+      });
+      setCurrentIndex(state => state + 1);
+    }
+  }, [api, gone, currentIndex]);
+
+  const bind = useDrag(({ args: [index], down, movement: [mx], direction: [xDir], velocity }) => {
     const trigger = velocity > 0.2;
     const dir = xDir < 0 ? -1 : 1;
-    if (!down && trigger) gone.add(index);
+    if (!down && trigger) swipe(dir);
     api.start(i => {
       if (index !== i) return;
       const isGone = gone.has(index);
@@ -51,10 +70,9 @@ const Index = () => {
       setTimeout(() => {
         gone.clear();
         api.start(i => to(i));
+        setCurrentIndex(0);
       }, 600);
-    }),
-    [api, gone]
-  );
+  });
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-pink-100">
@@ -94,10 +112,18 @@ const Index = () => {
         ))}
       </div>
       <div className="mt-8 flex space-x-4">
-        <button aria-label="Dislike" className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-full">
+        <button
+          aria-label="Dislike"
+          className="bg-red-400 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-full"
+          onClick={() => swipe(-1)}
+        >
           <X size={24} />
         </button>
-        <button aria-label="Like" className="bg-green-400 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-full">
+        <button
+          aria-label="Like"
+          className="bg-green-400 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-full"
+          onClick={() => swipe(1)}
+        >
           <Heart size={24} />
         </button>
       </div>
