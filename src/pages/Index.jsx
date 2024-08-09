@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useSprings, animated } from '@react-spring/web';
 import { useDrag } from '@use-gesture/react';
 import { Heart, X } from 'lucide-react';
@@ -28,7 +28,8 @@ const Index = () => {
     from: from(i),
   }));
 
-  const bind = useDrag(({ args: [index], down, movement: [mx], direction: [xDir], velocity }) => {
+  const bind = useCallback(
+    useDrag(({ args: [index], down, movement: [mx], direction: [xDir], velocity }) => {
     const trigger = velocity > 0.2;
     const dir = xDir < 0 ? -1 : 1;
     if (!down && trigger) gone.add(index);
@@ -51,7 +52,9 @@ const Index = () => {
         gone.clear();
         api.start(i => to(i));
       }, 600);
-  });
+    }),
+    [api, gone]
+  );
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-pink-100">
